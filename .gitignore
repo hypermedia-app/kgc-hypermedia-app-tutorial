@@ -1,0 +1,4 @@
+node_modules/
+
+# ignoring yarn.lock to prevent chrun when authoring steps
+yarn.lock

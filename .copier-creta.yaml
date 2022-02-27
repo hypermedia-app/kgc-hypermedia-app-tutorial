@@ -1,0 +1,15 @@
+_commit: 2.0.0
+_src_path: https://github.com/hypermedia-app/creta-project-template.git
+apis:
+- todos
+- users
+app_name: creta-todos
+author: Tomasz Pluskiewicz
+debugger_port: '46406'
+email: no-reply@t-code.pl
+node_version: '16'
+project_name: Creta TODO example
+repository: https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial
+ui_path: app
+vocabs: []
+

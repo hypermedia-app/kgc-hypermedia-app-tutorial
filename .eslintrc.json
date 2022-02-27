@@ -1,0 +1,9 @@
+{
+  "extends": [ "@open-wc", "@tpluscode" ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "globals": {
+    "localStorage": true
+  }
+}

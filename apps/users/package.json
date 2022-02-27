@@ -1,0 +1,15 @@
+{
+  "name": "@creta-todos/users",
+  "version": "0.0.0",
+  "private": "true",
+  "scripts": {
+    "bootstrap": "talos put --api $USERS_BASE --endpoint $SPARQL_ENDPOINT --user $SPARQL_USER --password $SPARQL_PASSWORD",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@hydrofoil/knossos": "^0.6.1"
+  },
+  "devDependencies": {
+    "@hydrofoil/talos": "^0.4.4"
+  }
+}

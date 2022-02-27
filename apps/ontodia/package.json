@@ -1,0 +1,23 @@
+{
+  "name": "@creta-todos/explorer",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server --mode development"
+  },
+  "dependencies": {
+    "graph-explorer": "^1.1.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.16.5",
+    "@open-wc/building-webpack": "^2.13.46",
+    "@types/react": "^16",
+    "@types/react-dom": "^16",
+    "webpack": "^4",
+    "webpack-cli": "^3",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.8.0"
+  }
+}

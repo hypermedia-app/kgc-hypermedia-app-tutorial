@@ -1,0 +1,31 @@
+{
+  "name": "@creta-todos/app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "precommit": "lit-analyzer --strict --quiet",
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development"
+  },
+  "dependencies": {
+    "@captaincodeman/rdx": "^1.0.0-rc.9",
+    "@hydrofoil/roadshow": "^0.4.0",
+    "@hydrofoil/shell": "^0.3.2",
+    "@rdfjs/data-model": "^2",
+    "lit": "^2.2.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.5",
+    "@babel/plugin-proposal-decorators": "^7.16.5",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.5",
+    "@babel/preset-typescript": "^7.16.5",
+    "@open-wc/building-webpack": "^2.13.46",
+    "dotenv-webpack": "^7",
+    "lit-analyzer": "^1.2.1",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-loader-rdf": "^0.2.0",
+    "webpack-merge": "^5.8.0"
+  }
+}

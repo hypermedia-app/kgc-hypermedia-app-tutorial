@@ -1,0 +1,8 @@
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX code: <https://code.described.at/>
+PREFIX schema: <http://schema.org/>
+PREFIX knossos: <https://hypermedia.app/knossos#>
+
+<>
+  a knossos:Configuration ;
+.
