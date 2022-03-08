@@ -1,0 +1,29 @@
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+<>
+  a rdfs:Class, sh:NodeShape ;
+  rdfs:subClassOf hydra:Resource ;
+  sh:property
+    [
+      sh:name "Title" ;
+      sh:path schema:name ;
+      sh:minCount 1 ;
+      sh:maxCount 1 ;
+      sh:minLength 3 ;
+    ],
+    [
+      sh:path schema:isPartOf ;
+      sh:minCount 1 ;
+      sh:maxCount 1 ;
+      sh:class </api/TodoList> ;
+    ],
+    [
+      sh:path schema:status ;
+      sh:minCount 1 ;
+      sh:maxCount 1 ;
+      sh:in ("IN PROGRESS" "COMPLETED")
+    ]
+.

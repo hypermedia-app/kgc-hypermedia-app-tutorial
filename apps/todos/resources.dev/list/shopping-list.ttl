@@ -1,0 +1,11 @@
+PREFIX schema: <http://schema.org/>
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+
+<>
+  a </api/TodoList> ;
+  hydra:memberAssertion
+    [
+      hydra:property schema:isPartOf ;
+      hydra:object <> ;
+    ] ;
+.

@@ -1,0 +1,8 @@
+PREFIX schema: <http://schema.org/>
+
+<>
+  a </api/TodoItem> ;
+  schema:name "Prepare KGC tutorial" ;
+  schema:isPartOf </list/kgc> ;
+  schema:status "COMPLETED" ;
+.

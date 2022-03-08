@@ -1,0 +1,13 @@
+PREFIX schema: <http://schema.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+<>
+  rdfs:subClassOf hydra:Collection ;
+  hydra:memberAssertion
+  [
+    hydra:property rdf:type ;
+    hydra:object </api/TodoItem> ;
+  ] ;
+.

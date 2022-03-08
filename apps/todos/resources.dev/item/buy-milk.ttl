@@ -1,0 +1,8 @@
+PREFIX schema: <http://schema.org/>
+
+<>
+  a </api/TodoItem> ;
+  schema:name "Buy milk" ;
+  schema:isPartOf </list/shopping-list> ;
+  schema:status "IN PROGRESS" ;
+.
