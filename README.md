@@ -1,35 +1,70 @@
 # Bridging the gap between business domains and Knowledge Graphs
 ### A Knowledge Graph Conference tutorial
 
-## Step 1 - defining resource models, authorization, and setting up local environment
+## Step 2 - authenticating user, creating TO-DO lists and items
 
-A Knowledge Graph is not just business resources but also all necessary metadata. This way, inspired by the [Data-Centric Manifesto][centric], makes the data easily portable and self-sufficient. Granted, it requires an application layer on top of it to produce working software but said layer must strive not to rely on logic encoded only within the implementing source code.  
-
-[centric]: http://www.datacentricmanifesto.org/
+To actually take advantage of authorization rules it is necessary to authenticate the caller to the API. This step will
+actually use a special case of authorizing resource owners, thus removing the `acl:Authorization` from the picture.
 
 TL;DR;
 
-[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-0...step-1) since step 0
+[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-1...step-2) since step 1
 
-## Data models
+## Authentication
 
-### `TodoItem` class
+<details>
+  <summary>🔍 Expand</summary>
 
-A SHACL Shape defines what individual TO-DOs should look like: [/todos/api/ToDoItem](apps/todos/resources/api/TodoItem.ttl) 
+This is the first example of functionalities which require JavaScript code. It is, naturally, referenced in RDF from the
+configuration resource [/api/config](apps/todos/resources/api/config.ttl#L9-L17).
 
-### `TodoList` - collection of TO-DOs
+The crucial detail of the [implementation](packages/auth/index.js#L29-L31), regardless of the used method, is to set
+the agent resource to the request when authentication succeeds.
 
-TO-DOs will be grouped in collection resources. A list of todos will be used to create new TO-DOs but sending a `POST` request.
+```typescript
+const agent = authenticateUser()
 
-## Access Control
+if (agent.term) {
+  req.agent = agent
+}
+```
 
-Every API operation (request) must be explicitly allowed using a subset of the [Web Access Control vocabulary](https://solid.github.io/web-access-control-spec/). For the moment, read-only access will be granted to anonymous clients.
+</details>
 
-## Local environment
+## Creating a new TO-DO list
 
-To quickly validate and test the data models and resource graphs, a set of development-time resources can easily be created. For that purpose, create a `apps/todos/resources.dev` directory. The template comes preconfigured to bootstrap resources in the local environment but there can be any number of analogous directories for various environments, such as `resources.prod` or `resources.uat`.
+<details>
+  <summary>🔍 Expand</summary>
+
+To create a new list, the API will allow clients to `PUT` its representation. Multiple conditions must be met for this to happen:
+
+1. Agent must be [authorized](apps/todos/resources/api/authorization/authenticated-create-lists.ttl) to do so. Here it's allowing any authenticated agent to create lists
+2. The class must [be SHACL Node Shape](apps/todos/resources/api/TodoList.ttl#L13)
+3. The class must [be explicitly annotated with `knossos:createWithPUT true`](apps/todos/resources/api/TodoList.ttl#L28)
+
+</details>
+
+## POST-ing items to TO-DO lists
+
+<details>
+  <summary>🔍 Expand</summary>
+
+To create TO-DO items, we will use `POST` to submit their representations to the collection. The `TodoList` class must
+explicitly [support such operation](apps/todos/resources/api/TodoList.ttl#L38-L50) (via `hydra:supportedOperation`).
+
+Because the collection is the target of the request, it is up to the server to assign an identifier to the newly created
+TO-DO item. They will be minted by filling an [RFC6570 URI Template](https://datatracker.ietf.org/doc/html/rfc6570) according
+to the description provided by collection's [`knossos:memberTemplate` property](apps/todos/resources/api/TodoList.ttl#L51-L61).
+
+Unlike previous examples, there is no `acl:Authorization` for creating TO-DO items. Instead, every list's owner will have
+full permission to access it (within the limitations of supported operations).
+
+</details>
 
 ## Try it!
+
+<details>
+  <summary>🔍 Expand</summary>
 
 Ensure local database is populated with new resources:
 
@@ -38,13 +73,57 @@ lando start
 yarn bootstrap
 ```
 
-Dereference a TO-DO list and a TO-DO item
+Create a new TO-DO list:
 
 ```
-curl -H accept:text/turtle https://creta-todos.lndo.site/todos/list/kgc
-curl -H accept:text/turtle https://creta-todos.lndo.site/todos/item/prepare-kgc-tutorial  
+curl -X PUT \
+     https://creta-todos.lndo.site/todos/list/bucket-list \
+     -u tomasz:super-secret \
+     -H content-type:text/turtle \
+     --data '
+     PREFIX schema: <http://schema.org/>
+     
+     <> a </todos/api/TodoList> ; schema:name "My bucket list" .
+     '
 ```
+
+Create a new TO-DO:
+
+```
+curl -X POST \
+     https://creta-todos.lndo.site/todos/list/bucket-list \
+     -u tomasz:super-secret \
+     -H content-type:text/turtle \
+     --data '
+     PREFIX schema: <http://schema.org/>
+     
+     <> schema:name "Ride Corbet'"'"'s couloir" .
+     '
+```
+
+See that it both got created as expected:
+
+```shell
+curl https://creta-todos.lndo.site/todos/list/bucket-list
+curl https://creta-todos.lndo.site/todos/item/Ride%20Corbet%27s%20couloir
+```
+
+</details>
+
+## "Filling in the blanks"
+
+<details>
+  <summary>🔍 Expand</summary>
+
+If you look closely at the resource definitions and examples above, you will notice that not all properties required by the
+respective SHACL shapes of TO-DO List and TO-DO Item are actually transmitted. They are instead set automatically based on
+the request information inside [resource hooks](https://creta.hypermedia.app/#/advanced/hooks).
+
+For example, the [`setOwner` function](packages/domain/todo-list.ts#L22-L26) sets the currently authenticated agent's as
+object of `acl:owner`. This is important for authorizing creation of new TO-DO items as mentioned above.
+
+</details>
 
 ## Next step
 
-[https://a.maze.link/kgc-tutorial-step-2](https://a.maze.link/kgc-tutorial-step-2)
+[https://a.maze.link/kgc-tutorial-step-3](https://a.maze.link/kgc-tutorial-step-3)

@@ -5,4 +5,13 @@ PREFIX knossos: <https://hypermedia.app/knossos#>
 
 <>
   a knossos:Configuration ;
+  knossos:middleware
+    [
+      schema:name "before" ;
+      code:implementedBy
+        [
+          a code:EcmaScript ;
+          code:link <node:@creta-todos/auth#basic> ;
+        ] ;
+    ] ;
 .

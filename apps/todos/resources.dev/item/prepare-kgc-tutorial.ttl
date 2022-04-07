@@ -1,8 +1,10 @@
 PREFIX schema: <http://schema.org/>
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
 
 <>
   a </api/TodoItem> ;
   schema:name "Prepare KGC tutorial" ;
   schema:isPartOf </list/kgc> ;
   schema:status "COMPLETED" ;
+  acl:owner <https://creta-todos.lndo.site/users/user/tomasz> ;
 .

@@ -2,12 +2,64 @@ PREFIX schema: <http://schema.org/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX auth: <https://hypermedia.app/auth#>
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+PREFIX code: <https://code.described.at/>
+PREFIX knossos: <https://hypermedia.app/knossos#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 <>
+  a hydra:Class, sh:NodeShape ;
   rdfs:subClassOf hydra:Collection ;
   hydra:memberAssertion
   [
     hydra:property rdf:type ;
     hydra:object </api/TodoItem> ;
   ] ;
+  sh:property
+    [
+      sh:path acl:owner ;
+      sh:minCount 1 ;
+      sh:maxCount 1 ;
+      sh:class foaf:Person ;
+    ] ;
+  knossos:createWithPUT true ;
+  knossos:preprocessPayload
+    [
+      a code:EcmaScript ;
+      code:link <node:@creta-todos/domain/todo-list#ensureMemberAssertions> ;
+    ] ,
+    [
+      a code:EcmaScript ;
+      code:link <node:@creta-todos/domain/todo-list#setOwner> ;
+    ] ,
+    [
+      a code:EcmaScript ;
+      code:link <node:@creta-todos/domain/todo-item#defaultStatus> ;
+    ];
+  hydra:supportedOperation
+    [
+      a schema:CreateAction ;
+      auth:access acl:Create ;
+      hydra:method "POST" ;
+      hydra:title "Create TO-DO item" ;
+      hydra:expects </api/TodoItem> ;
+      code:implementedBy
+        [
+          a code:EcmaScript ;
+          code:link <node:@hydrofoil/knossos/collection#CreateMember> ;
+        ] ;
+    ] ;
+  knossos:memberTemplate
+    [
+      a hydra:IriTemplate ;
+      hydra:template "/item/{title}" ;
+      hydra:mapping
+        [
+          hydra:variable "title" ;
+          hydra:property schema:name ;
+          hydra:required true ;
+        ] ;
+    ] ;
 .

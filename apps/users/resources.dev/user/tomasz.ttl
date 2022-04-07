@@ -1,0 +1,9 @@
+PREFIX kees: <http://linkeddata.center/kees/v1#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+<>
+  a foaf:Person ;
+  foaf:name "Tomasz Pluskiewicz" ;
+  foaf:accountName "tomasz" ;
+  kees:password "super-secret" ;
+.
