@@ -2,6 +2,10 @@
   "name": "@creta-todos/domain",
   "version": "0.0.0",
   "dependencies": {
-    "@tpluscode/rdf-ns-builders": "^1.1.0"
+    "@hydrofoil/knossos-events": "^0.3.6",
+    "@tpluscode/rdf-ns-builders": "^1.1.0",
+    "@tpluscode/sparql-builder": "^0.3.18",
+    "express-rdf-request": "^1.1.2",
+    "is-graph-pointer": "^1.0.1"
   }
 }

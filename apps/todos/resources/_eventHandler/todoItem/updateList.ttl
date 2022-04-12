@@ -1,0 +1,23 @@
+PREFIX as: <https://www.w3.org/ns/activitystreams#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix events: <https://hypermedia.app/events#>
+prefix code: <https://code.described.at/>
+
+<>
+  a events:EventHandler ;
+  events:eventSpec
+    [
+      rdf:predicate rdf:type ;
+      rdf:object as:Create ;
+    ] ;
+  events:objectSpec
+    [
+      rdf:predicate rdf:type ;
+      rdf:object </api/TodoItem> ;
+    ] ;
+  code:implementedBy
+    [
+      rdf:type code:EcmaScript ;
+      code:link <node:@creta-todos/domain/todo-list#updateProgress> ;
+    ] ;
+.

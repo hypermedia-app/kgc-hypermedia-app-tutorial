@@ -1,70 +1,49 @@
 # Bridging the gap between business domains and Knowledge Graphs
 ### A Knowledge Graph Conference tutorial
 
-## Step 2 - authenticating user, creating TO-DO lists and items
+## Step 3 - event-driven architecture
 
-To actually take advantage of authorization rules it is necessary to authenticate the caller to the API. This step will
-actually use a special case of authorizing resource owners, thus removing the `acl:Authorization` from the picture.
+Events are a powerful tool which allow the capture of changes in the domain objects over time. By persisting and handling
+events asynchronously, complex business processes can be implemented without relying on long transactions and high coupling.
+
+Most existing solutions require a specialized programming model and event persistence. Instead, I propose to simplify the 
+architecture by making events pure RDF resource, embedded in the Knowledge Graph.
 
 TL;DR;
 
-[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-1...step-2) since step 1
+[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-2...step-3) since step 2
 
-## Authentication
+## Default events
 
-<details>
-  <summary>🔍 Expand</summary>
+<details><summary>🔍 Expand</summary>
 
-This is the first example of functionalities which require JavaScript code. It is, naturally, referenced in RDF from the
-configuration resource [/api/config](apps/todos/resources/api/config.ttl#L9-L17).
+Creta comes with built-in support for creating and consuming events. Events are represented using [Activity Streams vocabulary][as].
+The default handlers emit `as:Create` and `as:Update` as result of successful PUT and POST requests.
 
-The crucial detail of the [implementation](packages/auth/index.js#L29-L31), regardless of the used method, is to set
-the agent resource to the request when authentication succeeds.
+This [example query](https://trifid.creta-todos.lndo.site/sparql/#query=PREFIX+as%3A+%3Chttps%3A%2F%2Fwww.w3.org%2Fns%2Factivitystreams%23%3E%0A%0Aconstruct+WHERE+%7B%0A++%3Fevent+a+as%3AActivity%2C+%3Ftype+%3B%0A+++++++++as%3Aobject+%3Chttps%3A%2F%2Fcreta-todos.lndo.site%2Ftodos%2Fitem%2FRide%2520Corbet%2527s%2520couloir%3E+%3B%0A+++++++++as%3AattributedTo+%3FattributedTo+%3B+%0A++++%09+as%3Acontext+%3Fcontext+%3B%0A+++++++++as%3Aactor+%3Factor+%3B%0A+++++++++as%3Apublished+%3Fpublished+%3B%0A+++++++++as%3Asummary+%3Fsummary+%3B%0A%7D%0A&contentTypeConstruct=text%2Fturtle&contentTypeSelect=application%2Fsparql-results%2Bjson&endpoint=https%3A%2F%2Ftrifid.creta-todos.lndo.site%2Fquery&requestMethod=POST&tabTitle=Query&headers=%7B%7D&outputFormat=rawResponse) will find the event representing
+the earlier creation of "Ride Corbet's couloir" TO-DO item.
 
-```typescript
-const agent = authenticateUser()
-
-if (agent.term) {
-  req.agent = agent
-}
-```
+[as]: https://www.w3.org/TR/activitystreams-core/
 
 </details>
 
-## Creating a new TO-DO list
+## Reacting to events
 
-<details>
-  <summary>🔍 Expand</summary>
+<details><summary>🔍 Expand</summary>
 
-To create a new list, the API will allow clients to `PUT` its representation. Multiple conditions must be met for this to happen:
+The natural way to take advantage of events is to implement declarative handlers. Again, and unsurprisingly, they are simply
+RDF resources which connect the kind of event to watch for with a piece of code which implements the additional action to
+take.
 
-1. Agent must be [authorized](apps/todos/resources/api/authorization/authenticated-create-lists.ttl) to do so. Here it's allowing any authenticated agent to create lists
-2. The class must [be SHACL Node Shape](apps/todos/resources/api/TodoList.ttl#L13)
-3. The class must [be explicitly annotated with `knossos:createWithPUT true`](apps/todos/resources/api/TodoList.ttl#L28)
-
-</details>
-
-## POST-ing items to TO-DO lists
-
-<details>
-  <summary>🔍 Expand</summary>
-
-To create TO-DO items, we will use `POST` to submit their representations to the collection. The `TodoList` class must
-explicitly [support such operation](apps/todos/resources/api/TodoList.ttl#L38-L50) (via `hydra:supportedOperation`).
-
-Because the collection is the target of the request, it is up to the server to assign an identifier to the newly created
-TO-DO item. They will be minted by filling an [RFC6570 URI Template](https://datatracker.ietf.org/doc/html/rfc6570) according
-to the description provided by collection's [`knossos:memberTemplate` property](apps/todos/resources/api/TodoList.ttl#L51-L61).
-
-Unlike previous examples, there is no `acl:Authorization` for creating TO-DO items. Instead, every list's owner will have
-full permission to access it (within the limitations of supported operations).
+For the sake of the simplest possible example, [this event handler](apps/todos/resources/_eventHandler/todoItem/updateList.ttl)
+will react to TO-DO items being created. Its [implementation](packages/domain/todo-list.ts#L51-L78) updates the
+containing list and in turn creates a new event accordingly.
 
 </details>
 
 ## Try it!
 
-<details>
-  <summary>🔍 Expand</summary>
+<details><summary>🔍 Expand</summary>
 
 Ensure local database is populated with new resources:
 
@@ -73,21 +52,7 @@ lando start
 yarn bootstrap
 ```
 
-Create a new TO-DO list:
-
-```
-curl -X PUT \
-     https://creta-todos.lndo.site/todos/list/bucket-list \
-     -u tomasz:super-secret \
-     -H content-type:text/turtle \
-     --data '
-     PREFIX schema: <http://schema.org/>
-     
-     <> a </todos/api/TodoList> ; schema:name "My bucket list" .
-     '
-```
-
-Create a new TO-DO:
+Create another TO-DO:
 
 ```
 curl -X POST \
@@ -97,33 +62,12 @@ curl -X POST \
      --data '
      PREFIX schema: <http://schema.org/>
      
-     <> schema:name "Ride Corbet'"'"'s couloir" .
+     <> schema:name "Trek Patagonia" .
      '
 ```
-
-See that it both got created as expected:
-
-```shell
-curl https://creta-todos.lndo.site/todos/list/bucket-list
-curl https://creta-todos.lndo.site/todos/item/Ride%20Corbet%27s%20couloir
-```
-
-</details>
-
-## "Filling in the blanks"
-
-<details>
-  <summary>🔍 Expand</summary>
-
-If you look closely at the resource definitions and examples above, you will notice that not all properties required by the
-respective SHACL shapes of TO-DO List and TO-DO Item are actually transmitted. They are instead set automatically based on
-the request information inside [resource hooks](https://creta.hypermedia.app/#/advanced/hooks).
-
-For example, the [`setOwner` function](packages/domain/todo-list.ts#L22-L26) sets the currently authenticated agent's as
-object of `acl:owner`. This is important for authorizing creation of new TO-DO items as mentioned above.
 
 </details>
 
 ## Next step
 
-[https://a.maze.link/kgc-tutorial-step-3](https://a.maze.link/kgc-tutorial-step-3)
+[https://a.maze.link/kgc-tutorial-step-4](https://a.maze.link/kgc-tutorial-step-4)
