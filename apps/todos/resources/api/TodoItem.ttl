@@ -4,6 +4,10 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+PREFIX dash: <http://datashapes.org/dash#>
+PREFIX knossos: <https://hypermedia.app/knossos#>
+PREFIX auth: <https://hypermedia.app/auth#>
+PREFIX code: <https://code.described.at/>
 
 <>
   a rdfs:Class, sh:NodeShape ;
@@ -21,6 +25,7 @@ PREFIX acl: <http://www.w3.org/ns/auth/acl#>
       sh:minCount 1 ;
       sh:maxCount 1 ;
       sh:class </api/TodoList> ;
+      dash:readOnly true ;
     ],
     [
       sh:path schema:status ;
@@ -34,5 +39,22 @@ PREFIX acl: <http://www.w3.org/ns/auth/acl#>
       sh:minCount 1 ;
       sh:maxCount 1 ;
       sh:class foaf:Person ;
-    ]
+      dash:readOnly true ;
+    ] ;
+  hydra:supportedOperation
+    [
+      a schema:UpdateAction ;
+      auth:access acl:Update ;
+      hydra:method "PUT" ;
+      code:implementedBy
+      [
+        a code:EcmaScript ;
+        code:link <node:@hydrofoil/knossos/resource#PUT> ;
+      ] ;
+    ] ;
+  knossos:beforeSave
+    [
+      a code:EcmaScript ;
+      code:link <node:@creta-todos/domain/resource#checkReadonlyProperties> ;
+    ] ;
 .

@@ -8,7 +8,7 @@ prefix code: <https://code.described.at/>
   events:eventSpec
     [
       rdf:predicate rdf:type ;
-      rdf:object as:Create ;
+      rdf:object as:Create, as:Update ;
     ] ;
   events:objectSpec
     [
