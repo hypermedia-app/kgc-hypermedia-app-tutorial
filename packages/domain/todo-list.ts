@@ -11,7 +11,7 @@ export const ensureMemberAssertions: ResourceHook = (req, pointer) => {
   const { method, agent } = req
 
   // only when creating a new TO-DO List
-  if (method === 'PUT' && agent) {
+  if (method === 'PUT') {
     if (!pointer.out(hydra.memberAssertion).terms.length) {
       pointer.addOut(hydra.memberAssertion, (ma) => {
         ma.addOut(hydra.property, schema.isPartOf)
@@ -19,7 +19,7 @@ export const ensureMemberAssertions: ResourceHook = (req, pointer) => {
       })
       pointer.addOut(hydra.memberAssertion, (ma) => {
         ma.addOut(hydra.property, acl.owner)
-        ma.addOut(hydra.object, agent)
+        ma.addOut(hydra.object, agent!)
       })
     }
   }

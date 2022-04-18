@@ -12,6 +12,7 @@ PREFIX code: <https://code.described.at/>
 <>
   a rdfs:Class, sh:NodeShape ;
   rdfs:subClassOf hydra:Resource ;
+  sh:and (</api/Resource>) ;
   sh:property
     [
       sh:name "Title" ;

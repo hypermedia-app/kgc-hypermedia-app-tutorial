@@ -12,11 +12,16 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 <>
   a hydra:Class, sh:NodeShape ;
   rdfs:subClassOf hydra:Collection ;
+  sh:and ( </api/Resource> ) ;
   hydra:memberAssertion
   [
     hydra:property rdf:type ;
     hydra:object </api/TodoItem> ;
-  ] ;
+  ],
+  [
+    hydra:property hydra:apiDocumentation ;
+    hydra:object </api> ;
+  ];
   sh:property
     [
       sh:path acl:owner ;
@@ -37,6 +42,10 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
     [
       a code:EcmaScript ;
       code:link <node:@creta-todos/domain/todo-item#defaultStatus> ;
+    ] ,
+    [
+      a code:EcmaScript ;
+      code:link <node:@creta-todos/domain/resource#ensureHydraApi> ;
     ];
   hydra:supportedOperation
     [

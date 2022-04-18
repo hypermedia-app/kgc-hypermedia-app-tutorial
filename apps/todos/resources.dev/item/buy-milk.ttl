@@ -1,3 +1,4 @@
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
 PREFIX schema: <http://schema.org/>
 
 <>
@@ -5,4 +6,10 @@ PREFIX schema: <http://schema.org/>
   schema:name "Buy milk" ;
   schema:isPartOf </list/shopping-list> ;
   schema:status "IN PROGRESS" ;
+  </api/TodoItem#tags> <buy-milk/tags> ;
+.
+
+<buy-milk/tags>
+  a </api/TodoItemTags> ;
+  hydra:member "priority" ;
 .

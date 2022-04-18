@@ -1,33 +1,68 @@
 # Bridging the gap between business domains and Knowledge Graphs
 ### A Knowledge Graph Conference tutorial
 
-## Step 4 - resource updates
+## Step 5 - DDD-esque patterns, CQRS
 
-Most APIs and, by extension, Knowledge Graphs are not append-only. API client will modify resources by sending 
+Creta separates concerns by turning a resource namespace into its own API. In this tutorial we've had `/todos` and `/users`.
+While the underlying Knowledge Graph is set up to combine all resources in a single database, the APIs and their concerns
+are logically separated.
 
 TL;DR;
 
-[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-3...step-4) since step 3
+[See what changed](https://github.com/hypermedia-app/kgc-hypermedia-app-tutorial/compare/step-4...step-5) since step 4
 
-## Modifying TO-DO items
+## API provenance
 
-<details><summary>🔍 Expand</summary>
+### Static resources
 
-To update a resource we will implement the HTTP `PUT` method, which requires that a new resource representation is
-sent to the server. This is done by [annotating the given class](apps/todos/resources/api/TodoItem.ttl#L44-L54) with a
-supported operation implemented by `@hydrofoil/knossos/resource#PUT`.
+Talos, the CLI tool used to bootstrap APIs, automatically sets a `hydra:apiDocumentation` property to each inserted resource
+graph. This serves the purpose of provenance, grouping all resources belonging to that API. Specifically, classes are
+gathered at application start to build a model of available client-server interactions (hypermedia affordances).
 
-In the case of the `/api/TodoItem` class, it could be desired to additionally prevent modifications of `acl:owner` and
-`schema:isPartOf` properties. 
+For example, if we were to add an ACL authorization resource [/todos/api/authenticated-read-all](apps/todos/resources/api/authorization/authenticated-read-all.ttl)
+which let every authenticated user permission to dereference any resource (provided any of its type is `rdfs:subClassOf rdfs:Resource`,
+which may not be the default assumption in all reasoners).
 
-There is no default support for such a feature, yet, but Creta makes is simple enough. By implementing a [BeforeSave hook](https://creta.hypermedia.app/#/advanced/hooks?id=before-save-hook), implementors can perform additional logic which access the original and modified
-representations of the resource.
+### User-generated resources
 
-To prevent changes to select properties, they can be [annotated in the SHACL shape](apps/todos/resources/api/TodoItem.ttl#L28)
-using the `dash:readOnly` predicate. The [hook's](apps/todos/resources/api/TodoItem.ttl#L56-L59) [implementation](packages/api/resource.ts#L6-L21)
-then looks up properties annotated this way, find the values and compares between the "before" and "after" resource state.
+On the other hand, resources created through client's requests to the API do not have that property set by default. If
+necessary, this could be changed by combining the techniques shown previously:
 
-</details>
+1. Use [SHACL to require `hydra:apiDocumentation`](apps/todos/resources/api/Resource.ttl)
+2. Use [resource hook](packages/api/resource.ts#L25-L29) to ensure it is set on TO-DO Lists
+3. Use [member assertion](apps/todos/resources/api/TodoList.ttl#L21-L24) to ensure it is set on TO-DO Items
+
+## Domain of a Bounded Context
+
+As [summarized](https://martinfowler.com/bliki/BoundedContext.html) by Martin Fowler
+
+> Bounded Context is a central pattern in Domain-Driven Design. It is the focus of DDD's strategic design section which 
+> is all about dealing with large models and teams. DDD deals with large models by dividing them into different Bounded 
+> Contexts and being explicit about their interrelationships. 
+> [...]
+> To be effective, a model needs to be unified - that is to be internally consistent so that there are no contradictions within it.
+
+RDF can apply context-specific models inside a bounded by subclassing, as could be done to create a more specific class
+of [`Person`](apps/users/resources/api/Person.ttl), mapped to a "core domain".
+
+## CQRS applied to Knowledge Graph
+
+CQRS stands for Command/Query Responsibility Segregation. At its core it means that reading from a database is separated
+from writing to it. 
+
+In the case of a Creta-based Knowledge Graph, most reads will be a simple SPARQL query over the union
+graph. This is where inferencing or [Graph Per Aspect](https://patterns.dataincubator.org/book/graph-per-aspect.html)
+pattern can be used to organize data but union graph builds a complete picture of the KG.
+
+On the other hand, writing an individual resource representation happens in [its own named graph](https://patterns.dataincubator.org/book/graph-per-resource.html). 
+This lets authors implement domain-specific rules which may otherwise be difficult to capture only using graph-y tools.
+This corresponds with Domain Driven Design's [Aggregate pattern](https://martinfowler.com/bliki/DDD_Aggregate.html) which
+defines a clear-cut boundary of resource integrity. Again, in the case of a Knowledge Graph as proposed, a resource's own
+named graph would be treated as a whole.
+
+For the sake of the example, let's [add a tags resource](apps/todos/resources.dev/item/buy-milk.ttl#L12-L15) as an entity
+inside TO-DO item's aggregate. It has its own URI which means it can be addressed and dereferenced but any modifications
+would have to go through the parent item (Aggregate Root).
 
 ## Try it!
 
@@ -36,35 +71,66 @@ then looks up properties annotated this way, find the values and compares betwee
 Ensure local database is populated with new resources:
 
 ```
-lando start
+curl http://admin:password@db.creta-todos.lndo.site/repositories/creta-todos -X POST \
+  --data 'update=delete+%7B+graph+%3Fg+%7B+%3Fs+%3Fp+%3Fo+%7D+%7D+where+%7B+graph+%3Fg+%7B+%3Fs+%3Fp+%3Fo+%7D+%7D'
 yarn bootstrap
 ```
 
-Mark a TO-DO as complete
+### Resource permissions
+
+See that any resource in `/todos` namespace can be dereferenced
+
+```
+curl -I https://creta-todos.lndo.site/todos/api/TodoList -u tomasz:super-secret 
+```
+
+But not in `/users` namespace
+
+```
+curl -I https://creta-todos.lndo.site/users/user/tomasz -u tomasz:super-secret 
+```
+
+### API provenance
+
+Re-create the TO-DO List
 
 ```
 curl -X PUT \
-     https://creta-todos.lndo.site/todos/item/Ride%20Corbet%27s%20couloir \
+     https://creta-todos.lndo.site/todos/list/bucket-list \
      -u tomasz:super-secret \
      -H content-type:text/turtle \
      --data '
      PREFIX schema: <http://schema.org/>
-     PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+     
+     <> a </todos/api/TodoList> ; schema:name "My bucket list" .
+     '
+ ```
 
-     <> 
-       a </todos/api/TodoItem> ;
-       schema:name "Ride Corbet'"'"'s couloir" ;
-       schema:isPartOf </todos/list/bucket-list> ;
-       schema:status "COMPLETED" ;
-       acl:owner </users/user/tomasz> ;
-     .
+Post a new TO-DO
+
+```
+curl -X POST \
+     https://creta-todos.lndo.site/todos/list/bucket-list \
+     -u tomasz:super-secret \
+     -H content-type:text/turtle \
+     --data '
+     PREFIX schema: <http://schema.org/>
+     
+     <> schema:name "Ski Lenin Peak" .
      '
 ```
 
-Check that [status was updated](http://trifid.creta-todos.lndo.site/sparql/#query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0Aask+%7B%0A++%3Chttps%3A%2F%2Fcreta-todos.lndo.site%2Ftodos%2Flist%2Fbucket-list%3E+schema%3Astatus+%22COMPLETED%22+%0A%7D%0A%0A&contentTypeConstruct=text%2Fturtle&contentTypeSelect=application%2Fsparql-results%2Bjson&endpoint=http%3A%2F%2Ftrifid.creta-todos.lndo.site%2Fquery&requestMethod=POST&tabTitle=Query+2&headers=%7B%7D&outputFormat=rawResponse)
+[Observe](http://trifid.creta-todos.lndo.site/sparql/#query=PREFIX+hydra%3A+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fhydra%2Fcore%23%3E%0ABASE+%3Chttps%3A%2F%2Fcreta-todos.lndo.site%2Ftodos%2F%3E%0A%0Aselect+%3Fresource+%3Fdoc+%7B%0A++VALUES+%3Fresource+%7B+%3Citem%2FSki%2520Lenin%2520Peak%3E+%3Clist%2Fbucket-list%3E+%7D%0A++%3Fresource+hydra%3AapiDocumentation+%3Fdoc+.%0A%7D&contentTypeConstruct=text%2Fturtle&contentTypeSelect=application%2Fsparql-results%2Bjson&endpoint=http%3A%2F%2Ftrifid.creta-todos.lndo.site%2Fquery&requestMethod=POST&tabTitle=Query+1&headers=%7B%7D&outputFormat=table) that both are created with `hydra:apiDocumentation`
 
 </details>
 
+
+### Aggregates and entities
+
+```
+curl https://creta-todos.lndo.site/todos/item/buy-milk/tags
+```
+
 ## Next step
 
-[https://a.maze.link/kgc-tutorial-step-5](https://a.maze.link/kgc-tutorial-step-5)
+[https://a.maze.link/kgc-tutorial-step-6](https://a.maze.link/kgc-tutorial-step-6)

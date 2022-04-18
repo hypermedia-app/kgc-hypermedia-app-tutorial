@@ -1,0 +1,16 @@
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX knossos: <https://hypermedia.app/knossos#>
+PREFIX code: <https://code.described.at/>
+
+<>
+  a sh:NodeShape ;
+  sh:property
+  [
+    sh:path hydra:apiDocumentation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:hasValue </api> ;
+  ] ;
+.
