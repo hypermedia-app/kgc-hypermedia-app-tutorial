@@ -1,0 +1,40 @@
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+PREFIX schema: <http://schema.org/>
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX dash: <http://datashapes.org/dash#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+prefix hex: <https://w3id.org/hydra/extension#>
+prefix auth: <https://hypermedia.app/auth#>
+prefix roadshow: <https://hypermedia.app/roadshow#>
+
+<>
+  a sh:NodeShape ;
+  dash:applicableToClass </api/TodoList> ;
+  </api#shapeKind> </api#ViewShape> ;
+  sh:property
+    [
+      sh:path hydra:member ;
+      dash:viewer hex:CollectionViewer ;
+      sh:order 1 ;
+      sh:node
+        [
+          sh:property
+            [
+              sh:name "Title" ;
+              sh:path schema:name ;
+              sh:order 2 ;
+            ],
+            [
+              sh:name "Status" ;
+              sh:path schema:status ;
+              sh:order 1 ;
+            ],
+            [
+              sh:path roadshow:self ;
+              sh:order 3 ;
+              dash:viewer hex:TodoStatusToggleButtonEditor ;
+              auth:access acl:Update ;
+            ];
+        ] ;
+    ] ;
+.

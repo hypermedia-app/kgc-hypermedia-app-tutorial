@@ -10,9 +10,19 @@
   "dependencies": {
     "@captaincodeman/rdx": "^1.0.0-rc.9",
     "@hydrofoil/roadshow": "^0.4.0",
+    "@hydrofoil/shaperone-wc": "^0.6.8",
     "@hydrofoil/shell": "^0.3.2",
+    "@hydrofoil/shell-auth": "^0.3.1",
+    "@hydrofoil/vocabularies": "^0.3.1",
     "@rdfjs/data-model": "^2",
-    "lit": "^2.2.0"
+    "@rdfjs/namespace": "^1",
+    "@tpluscode/rdf-ns-builders": "^1.1.0",
+    "alcaeus": "^2.2.2",
+    "clownface": "^1.5.1",
+    "clownface-shacl-path": "^1.3.1",
+    "is-graph-pointer": "^1.1.0",
+    "lit": "^2.2.0",
+    "rdf-ext": "^1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.16.5",
@@ -20,6 +30,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
     "@open-wc/building-webpack": "^2.13.46",
+    "@types/rdfjs__namespace": "^1.0.0",
     "dotenv-webpack": "^7",
     "lit-analyzer": "^1.2.1",
     "webpack": "^4.46.0",

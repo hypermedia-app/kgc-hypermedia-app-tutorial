@@ -1,0 +1,36 @@
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+PREFIX schema: <http://schema.org/>
+PREFIX dash: <http://datashapes.org/dash#>
+prefix sh: <http://www.w3.org/ns/shacl#>
+prefix hex: <https://w3id.org/hydra/extension#>
+prefix auth: <https://hypermedia.app/auth#>
+prefix roadshow: <https://hypermedia.app/roadshow#>
+prefix query: <https://hypermedia.app/query#>
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+
+<>
+  a sh:NodeShape ;
+  dash:applicableToClass schema:WebPage ;
+  </api#shapeKind> </api#ViewShape> ;
+  sh:property
+    [
+      sh:path schema:name ;
+      dash:viewer dash:LiteralViewer ;
+      roadshow:headerLevel 1 ;
+      sh:order 1 ;
+    ] ,
+    [
+      sh:path schema:mainEntity ;
+      sh:order 2 ;
+      dash:viewer hex:OperationFormViewer ;
+      hex:operation schema:CreateAction ;
+      auth:access acl:Create ;
+      roadshow:dereference true ;
+    ],
+    [
+      sh:path schema:mainEntity ;
+      sh:order 3 ;
+      dash:viewer dash:DetailsViewer ;
+      roadshow:dereference true ;
+    ] ;
+.

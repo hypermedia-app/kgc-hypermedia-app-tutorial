@@ -1,0 +1,12 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+
+<>
+  a acl:Authorization ;
+  acl:agentClass foaf:Agent ;
+  acl:accessTo </api/view-shapes> ;
+  acl:accessToClass sh:NodeShape, schema:WebPage ;
+  acl:mode acl:Read ;
+.

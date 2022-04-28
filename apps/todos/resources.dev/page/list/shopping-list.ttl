@@ -1,0 +1,7 @@
+PREFIX schema: <http://schema.org/>
+
+<>
+  a schema:WebPage ;
+  schema:name "Tomasz's shopping list" ;
+  schema:mainEntity </list/shopping-list> ;
+.

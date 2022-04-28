@@ -8,6 +8,7 @@ PREFIX code: <https://code.described.at/>
 PREFIX knossos: <https://hypermedia.app/knossos#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
+prefix query: <https://hypermedia.app/query#>
 
 <>
   a hydra:Class, sh:NodeShape ;
@@ -53,7 +54,7 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
       auth:access acl:Create ;
       hydra:method "POST" ;
       hydra:title "Create TO-DO item" ;
-      hydra:expects </api/TodoItem> ;
+      hydra:expects </api/TodoItem#New> ;
       code:implementedBy
         [
           a code:EcmaScript ;
@@ -71,4 +72,13 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
           hydra:required true ;
         ] ;
     ] ;
+  query:order
+    (
+      [
+        query:path schema:status ;
+      ]
+      [
+        query:path schema:name ;
+      ]
+    ) ;
 .

@@ -1,0 +1,37 @@
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
+prefix query: <https://hypermedia.app/query#>
+prefix code: <https://code.described.at/>
+
+<>
+  a </api/ShapesCollection> ;
+  hydra:memberAssertion
+    [
+      hydra:property rdf:type ;
+      hydra:object sh:NodeShape ;
+    ],
+    [
+      hydra:property hydra:apiDocumentation ;
+      hydra:object </api> ;
+    ],
+    [
+      hydra:property </api#shapeKind> ;
+      hydra:object </api#ViewShape> ;
+    ] ;
+  hydra:search
+    [
+      a hydra:IriTemplate ;
+      hydra:template "{?resource}" ;
+      hydra:mapping
+        [
+          hydra:variable "resource" ;
+          hydra:property sh:targetNode ;
+          query:filter
+            [
+              a code:EcmaScript ;
+              code:link <node:@creta-todos/domain/shapes#filterByTargetNode> ;
+            ] ;
+        ] ;
+    ] ;
+.

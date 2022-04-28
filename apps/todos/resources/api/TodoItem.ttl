@@ -9,10 +9,8 @@ PREFIX knossos: <https://hypermedia.app/knossos#>
 PREFIX auth: <https://hypermedia.app/auth#>
 PREFIX code: <https://code.described.at/>
 
-<>
-  a rdfs:Class, sh:NodeShape ;
-  rdfs:subClassOf hydra:Resource ;
-  sh:and (</api/Resource>) ;
+<#New>
+  a sh:NodeShape ;
   sh:property
     [
       sh:name "Title" ;
@@ -20,7 +18,14 @@ PREFIX code: <https://code.described.at/>
       sh:minCount 1 ;
       sh:maxCount 1 ;
       sh:minLength 3 ;
-    ],
+    ] ;
+.
+
+<>
+  a rdfs:Class, sh:NodeShape ;
+  rdfs:subClassOf hydra:Resource ;
+  sh:and ( </api/Resource> <#New> ) ;
+  sh:property
     [
       sh:path schema:isPartOf ;
       sh:minCount 1 ;
@@ -32,7 +37,7 @@ PREFIX code: <https://code.described.at/>
       sh:path schema:status ;
       sh:minCount 1 ;
       sh:maxCount 1 ;
-      sh:in ("IN PROGRESS" "COMPLETED") ;
+      sh:in ( "IN PROGRESS" "COMPLETED" ) ;
       sh:message "Status must be 'IN PROGRESS' or 'COMPLETED'" ;
     ],
     [
@@ -48,10 +53,10 @@ PREFIX code: <https://code.described.at/>
       auth:access acl:Update ;
       hydra:method "PUT" ;
       code:implementedBy
-      [
-        a code:EcmaScript ;
-        code:link <node:@hydrofoil/knossos/resource#PUT> ;
-      ] ;
+        [
+          a code:EcmaScript ;
+          code:link <node:@hydrofoil/knossos/resource#PUT> ;
+        ] ;
     ] ;
   knossos:beforeSave
     [

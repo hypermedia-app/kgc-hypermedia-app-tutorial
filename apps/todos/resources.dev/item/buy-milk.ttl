@@ -1,3 +1,4 @@
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
 PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
 PREFIX schema: <http://schema.org/>
 
@@ -7,6 +8,7 @@ PREFIX schema: <http://schema.org/>
   schema:isPartOf </list/shopping-list> ;
   schema:status "IN PROGRESS" ;
   </api/TodoItem#tags> <buy-milk/tags> ;
+  acl:owner <https://creta-todos.lndo.site/users/user/tomasz> ;
 .
 
 <buy-milk/tags>

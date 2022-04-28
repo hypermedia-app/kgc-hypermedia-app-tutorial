@@ -1,3 +1,4 @@
+PREFIX acl: <http://www.w3.org/ns/auth/acl#>
 PREFIX schema: <http://schema.org/>
 PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
 
@@ -8,4 +9,5 @@ PREFIX hydra: <http://www.w3.org/ns/hydra/core#>
       hydra:property schema:isPartOf ;
       hydra:object <> ;
     ] ;
+  acl:owner <https://creta-todos.lndo.site/users/user/tomasz> ;
 .
