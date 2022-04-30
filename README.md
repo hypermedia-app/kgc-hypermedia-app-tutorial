@@ -27,3 +27,14 @@ You will need to prepare:
 4. Bootstrap from the template
 
 If you have any questions, please do not hesitate to open issues in this repository so that we can spend the allotted conference time as productive as possible.
+
+## Get started
+
+To start, clone this repo and check out `step-0` tag
+
+```
+git clone git@github.com:hypermedia-app/kgc-hypermedia-app-tutorial.git
+git checkout step-0
+```
+
+Or you might prefer to just [explore in the browser](https://a.maze.link/kgc-tutorial-start)
