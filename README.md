@@ -38,3 +38,7 @@ git checkout step-0
 ```
 
 Or you might prefer to just [explore in the browser](https://a.maze.link/kgc-tutorial-start)
+
+## Slides
+
+The slide deck is also [published in this repository](slides.pdf).
